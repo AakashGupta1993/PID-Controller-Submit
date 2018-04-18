@@ -1,5 +1,5 @@
 #include "PID.h"
-
+#include "math.h"
 using namespace std;
 
 /*
@@ -13,6 +13,9 @@ PID::PID() {
   p_error = 0;
   i_error = 0;
   d_error = 0;
+  count = 0;
+  errorSum=0;
+  dp = [1,1,1];
 }
 
 PID::~PID() {}
@@ -25,12 +28,10 @@ void PID::Init(double Kp, double Ki, double Kd) {
 
 void PID::UpdateError(double cte) {
 	
-  //double prev_cte = 0.0;
-  //double int_cte = 0;
-  d_error = cte - p_error;	
-  p_error = cte;
-  i_error += cte;
-
+  d_error = cte - p_error;	      
+  p_error = cte;                  
+  i_error += cte;                 
+  errorSum = errorSum + fabs(cte);
 }
 
 double PID::TotalError() {
@@ -38,3 +39,19 @@ double PID::TotalError() {
   return steer;
 }
 
+void PID::UpdateCount(){
+    count++;
+}
+
+int PID::GetCount(){
+	return count;
+}
+
+double long PID::GetSum(){
+	return errorSum;
+}
+
+void PID::SetCount(){
+    count = 0;
+	errorSum = 0;
+}

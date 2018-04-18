@@ -34,8 +34,11 @@ int main()
 
   PID pid;
   // TODO: Initialize the pid variable.
-  pid.Init(0.3,0.02,2.0);
-
+  //pid.Init(0.3,0.01,2.0);
+  pid.Init(0.5,0.01,2.0); // ocillations increased
+  //pid.Init(0.3,0.1,2.0); // ocillations increased and car not on track any more
+  //pid.Init(0.3,0.0001,2.0); // ocillations increased and car not on track any more
+  
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -58,7 +61,7 @@ int main()
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
-          
+          pid.UpdateCount();
           pid.UpdateError(cte);
           steer_value = pid.TotalError();
           
@@ -69,14 +72,34 @@ int main()
           }
           
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
+          //std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
+		  std::cout <<cte <<",";
+		  
+		  
+		  if (pid.GetCount() == 10 ){
+			// Resetting the Simulator
+			std::string msg("42[\"reset\",{}]");
+			ws.send(msg.data(),msg.length(), uWS::OpCode::TEXT);  
+			std::cout << "]" ;
+			std::cout << "Sum error "<< pid.GetSum();
+			std::cout << "PID : ["<<pid.Kp<<","<<pid.Ki<<","<<pid.Kd<<"]"<<std::endl<< std::endl;
+			
+			
+			if (pid.dp[0]+pid.dp[1]+pid.dp[2] < 0.1 ){
+				cout<<"Done";
+			}
+			
+			
+			pid.SetCount();
+		  }
+		  
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.05;
+          msgJson["throttle"] = 0.02;
           //msgJson["speed"] = 1;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+          //std::cout << "" << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
