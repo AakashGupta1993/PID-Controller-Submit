@@ -9,9 +9,6 @@ public:
   double p_error;
   double i_error;
   double d_error;
-  int count;
-  long double errorSum;
-  float dp[];
   /*
   * Coefficients
   */ 
@@ -43,25 +40,5 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
-
-  /*
-  * Update count
-  */
-  void SetCount();
-
-  /*
-  * Update count
-  */
-  void UpdateCount();
-
-  /*
-  * Get count
-  */
-  int GetCount();
-
-  /*
-  * Get Sum
-  */
-  double long GetSum();
 };
 #endif /* PID_H */
